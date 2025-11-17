@@ -1,0 +1,23 @@
+.list-pokemon {
+  width: 100%;
+  justify-content: left;
+  margin-right: 40%;
+}
+
+.cardpokemon {
+  width: 50%;
+  border-radius: 5%;
+  color: red;
+  background-color: white;
+  box-shadow: 0 1px 1px 1px rgba(255, 0, 0, 0.411);
+}
+
+.type {
+  color: blue;
+}
+
+.captureButton {
+  background-color: red;
+  color: white;
+  justify-content: center;
+}
