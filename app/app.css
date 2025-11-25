@@ -1,23 +1,26 @@
+.pokedex {
+  display: flex;
+  gap: 40px;
+}
+
 .list-pokemon {
-  width: 100%;
-  justify-content: left;
-  margin-right: 40%;
+  width: 50%;
+}
+
+.list-captured {
+  width: 50%;
 }
 
 .cardpokemon {
-  width: 50%;
-  border-radius: 5%;
-  color: red;
+  width: 70%;
+
+  border-radius: 15px;
+  color: rgb(76, 0, 255);
   background-color: white;
-  box-shadow: 0 1px 1px 1px rgba(255, 0, 0, 0.411);
+  box-shadow: 0 1px 3px rgba(205, 9, 9, 0.75);
 }
 
-.type {
-  color: blue;
-}
-
-.captureButton {
-  background-color: red;
-  color: white;
-  justify-content: center;
+.cardpokemon img {
+  display: block;
+  margin: 10px auto;
 }
