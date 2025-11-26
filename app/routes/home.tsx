@@ -166,9 +166,6 @@ export async function loader({ request }: Route.LoaderArgs) {
     });
   }
 
-  // I like that even if you are naming "filteredPokemons" you return that
-  // state as "pokemons" to the route component, that way you don't have to
-  // read "filtered" all the time
   return { pokemons: filteredPokemons, capturedIds, filterTypes };
 }
 
