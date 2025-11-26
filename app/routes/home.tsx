@@ -93,13 +93,8 @@ export async function action({ request }: Route.ActionArgs) {
   switch (intent) {
     case INTENT.SET_CAPTURE: {
       const url = new URL(request.url);
-      // captured what?
       const captured = url.searchParams.get("captured");
-      // captured list of what?
-      // "list" and "array" should not be used as variable names
-      // instead, name the noun as plural
       const capturedIds = captured ? JSON.parse(captured) : [];
-      // the idea of a name is that by just reading it, I know what state it stores
       capturedIds.push(pokemonId);
       url.searchParams.set("captured", JSON.stringify(capturedIds));
       return redirect(url.toString());
@@ -107,7 +102,6 @@ export async function action({ request }: Route.ActionArgs) {
     case INTENT.SET_RELEASE: {
       const url = new URL(request.url);
       const captured = url.searchParams.get("captured");
-      // same here
       const capturedList = captured ? JSON.parse(captured) : [];
       const capturatedIds = capturedList.filter((saveId: string) => {
         return saveId !== pokemonId;
@@ -119,9 +113,6 @@ export async function action({ request }: Route.ActionArgs) {
       const filterName = v.parse(v.string(), formData.get("name"));
       const filterType = v.parse(v.string(), formData.get("type"));
       const url = new URL(request.url);
-      // no need to default to an empty string, as that's imposible
-      // given that you've already validated both "name" and "type"
-      // form data entries
       url.searchParams.set("name", filterName);
       url.searchParams.set("type", filterType);
       return redirect(url.toString());
