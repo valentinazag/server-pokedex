@@ -43,6 +43,7 @@ function Card({
           })
           .join(",")}
       </p>
+
       <Form method="POST">
         <input type="hidden" name="pokemonId" value={pokemon.id} />
         {isCaptured ? (
@@ -61,7 +62,7 @@ function Card({
 
 function Filter({ types }: { types: string[] }) {
   return (
-    <Form>
+    <Form method="POST">
       <input type="text" name="name" placeholder="filter pokemon" />
       <select name="type" id="">
         <option value="">All types</option>
@@ -89,32 +90,55 @@ const INTENT = {
 export async function action({ request }: Route.ActionArgs) {
   const formData = await request.formData();
   const intent = formData.get("intent");
-  const pokemonId = v.parse(v.string(), formData.get("pokemonId"));
+
   switch (intent) {
     case INTENT.SET_CAPTURE: {
+      const pokemonId = v.parse(v.string(), formData.get("pokemonId"));
       const url = new URL(request.url);
-      const captured = url.searchParams.get("captured");
-      const capturedIds = captured ? JSON.parse(captured) : [];
-      capturedIds.push(pokemonId);
-      url.searchParams.set("captured", JSON.stringify(capturedIds));
+      const capturedPokemons = url.searchParams.get("capturedPokemons");
+      const capturedPokemonsIds = capturedPokemons
+        ? JSON.parse(capturedPokemons)
+        : [];
+      capturedPokemonsIds.push(pokemonId);
+      url.searchParams.set(
+        "capturedPokemons",
+        JSON.stringify(capturedPokemonsIds),
+      );
       return redirect(url.toString());
     }
     case INTENT.SET_RELEASE: {
+      const pokemonId = v.parse(v.string(), formData.get("pokemonId"));
       const url = new URL(request.url);
-      const captured = url.searchParams.get("captured");
-      const capturedList = captured ? JSON.parse(captured) : [];
-      const capturatedIds = capturedList.filter((saveId: string) => {
-        return saveId !== pokemonId;
-      });
-      url.searchParams.set("captured", JSON.stringify(capturatedIds));
+      const capturedPokemons = url.searchParams.get("capturedPokemons");
+      const capturedPokemonsSaved = capturedPokemons
+        ? JSON.parse(capturedPokemons)
+        : [];
+      const capturatedPokemonIds = capturedPokemonsSaved.filter(
+        (saveId: string) => {
+          return saveId !== pokemonId;
+        },
+      );
+      url.searchParams.set(
+        "capturedPokemons",
+        JSON.stringify(capturatedPokemonIds),
+      );
       return redirect(url.toString());
     }
     case INTENT.SET_FILTERS: {
       const filterName = v.parse(v.string(), formData.get("name"));
       const filterType = v.parse(v.string(), formData.get("type"));
       const url = new URL(request.url);
-      url.searchParams.set("name", filterName);
-      url.searchParams.set("type", filterType);
+      if (filterName) {
+        url.searchParams.set("name", filterName);
+      } else {
+        url.searchParams.delete("name");
+      }
+      if (filterType) {
+        url.searchParams.set("type", filterType);
+      } else {
+        url.searchParams.delete("type");
+      }
+      url.searchParams.delete("intent");
       return redirect(url.toString());
     }
   }
@@ -147,8 +171,10 @@ export async function loader({ request }: Route.LoaderArgs) {
   ];
 
   const url = new URL(request.url);
-  const captured = url.searchParams.get("captured");
-  const capturedIds = captured ? JSON.parse(captured).map(Number) : [];
+  const capturedPokemons = url.searchParams.get("capturedPokemons");
+  const capturedPokemonsIds = capturedPokemons
+    ? JSON.parse(capturedPokemons).map(Number)
+    : [];
   const name = url.searchParams.get("name");
   const type = url.searchParams.get("type");
 
@@ -166,13 +192,13 @@ export async function loader({ request }: Route.LoaderArgs) {
     });
   }
 
-  return { pokemons: filteredPokemons, capturedIds, filterTypes };
+  return { pokemons: filteredPokemons, capturedPokemonsIds, filterTypes };
 }
 
 export default function Home({ loaderData }: Route.ComponentProps) {
-  const { pokemons, capturedIds, filterTypes } = loaderData;
+  const { pokemons, capturedPokemonsIds, filterTypes } = loaderData;
   const capturedPokemons = pokemons.filter((pokemons) => {
-    return capturedIds.includes(pokemons.id);
+    return capturedPokemonsIds.includes(pokemons.id);
   });
 
   return (
@@ -187,7 +213,7 @@ export default function Home({ loaderData }: Route.ComponentProps) {
             <Card
               key={pokemon.id}
               pokemon={pokemon}
-              isCaptured={capturedIds.includes(pokemon.id)}
+              isCaptured={capturedPokemonsIds.includes(pokemon.id)}
             />
           );
         })}
