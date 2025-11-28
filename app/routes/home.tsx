@@ -74,6 +74,8 @@ function Filter({ types }: { types: string[] }) {
           );
         })}
       </select>
+      {/* using `useFetcher` from react router, submit this form without
+          needing a submit button */}
       <button type="submit" name="intent" value={INTENT.SET_FILTERS}>
         Filter pokemons
       </button>
@@ -97,7 +99,8 @@ export async function action({ request }: Route.ActionArgs) {
       const url = new URL(request.url);
       const capturedPokemons = url.searchParams.get("capturedPokemons");
       const capturedPokemonsIds = capturedPokemons
-        ? JSON.parse(capturedPokemons)
+        ? // TODO: strictly verify the returning value of "JSON.parse"
+          JSON.parse(capturedPokemons)
         : [];
       capturedPokemonsIds.push(pokemonId);
       url.searchParams.set(
@@ -111,8 +114,10 @@ export async function action({ request }: Route.ActionArgs) {
       const url = new URL(request.url);
       const capturedPokemons = url.searchParams.get("capturedPokemons");
       const capturedPokemonsSaved = capturedPokemons
-        ? JSON.parse(capturedPokemons)
+        ? // TODO: strictly verify the returning value of "JSON.parse"
+          JSON.parse(capturedPokemons)
         : [];
+
       const capturatedPokemonIds = capturedPokemonsSaved.filter(
         (saveId: string) => {
           return saveId !== pokemonId;
@@ -173,11 +178,14 @@ export async function loader({ request }: Route.LoaderArgs) {
   const url = new URL(request.url);
   const capturedPokemons = url.searchParams.get("capturedPokemons");
   const capturedPokemonsIds = capturedPokemons
-    ? JSON.parse(capturedPokemons).map(Number)
+    ? // TODO: strictly verify the returning value of "JSON.parse"
+      JSON.parse(capturedPokemons).map(Number)
     : [];
   const name = url.searchParams.get("name");
   const type = url.searchParams.get("type");
 
+  // TODO: prefer using "pure" array functions instead of
+  // reasigning a variable's value
   let filteredPokemons = pokemons;
   if (name) {
     filteredPokemons = filteredPokemons.filter((pokemon) => {
